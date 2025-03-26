@@ -1,4 +1,4 @@
-name: Deploy to VPS via Docker
+name: Deploy Walrus-Labs to VPS via Docker
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: main
     env:
-      KUMA_URL: https://uptime.walrus-labs.fr
+      KUMA_URL: http://uptime.walrus-labs.fr
       KUMA_MONITOR_ID: ${{ secrets.KUMA_MONITOR_ID }}
       KUMA_API_KEY: ${{ secrets.KUMA_API_KEY }}
       VPS_IP: ${{ secrets.VPS_IP }}
@@ -25,6 +25,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 22
+
+      - name: 📦 Installer les dépendances
+        run: npm install
 
       - name: 🛠️ Activer maintenance Uptime Kuma
         run: |
