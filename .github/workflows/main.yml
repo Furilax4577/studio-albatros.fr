@@ -3,12 +3,12 @@ name: Deploy Walrus-Labs to VPS via Docker
 on:
   push:
     branches:
-      - master # 🚀 Déclenche le déploiement uniquement sur la branche master
+      - main # 🚀 Déclenche le déploiement uniquement sur la branche main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: master
+    environment: main
     steps:
       - name: 📥 Cloner le dépôt
         uses: actions/checkout@v3
