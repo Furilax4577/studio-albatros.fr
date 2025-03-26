@@ -1,13 +1,13 @@
 <div class="chat">
-  <div class="messages">
+  <div class="messages" #scrollContainer>
     <div
       class="line"
       [ngClass]="message.source"
       *ngFor="let message of messages"
     >
       <div class="message">
-        <strong>{{ message.source === "to" ? "Moi" : "Albatar" }}: </strong
-        >{{ message.message }}
+        <strong>{{ message.source === "to" ? "Moi" : "Albatar" }}</strong>
+        <markdown [data]="message.message"></markdown>
       </div>
     </div>
   </div>

@@ -1,14 +1,22 @@
-name: Deploy Walrus-Labs to VPS via Docker
+name: Deploy to VPS via Docker
 
 on:
   push:
     branches:
-      - main # 🚀 Déclenche le déploiement uniquement sur la branche main
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: main
+    env:
+      KUMA_URL: https://uptime.walrus-labs.fr
+      KUMA_MONITOR_ID: ${{ secrets.KUMA_MONITOR_ID }}
+      KUMA_API_KEY: ${{ secrets.KUMA_API_KEY }}
+      VPS_IP: ${{ secrets.VPS_IP }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+
     steps:
       - name: 📥 Cloner le dépôt
         uses: actions/checkout@v3
@@ -21,30 +29,50 @@ jobs:
       - name: 📦 Installer les dépendances
         run: npm install
 
+      - name: 🛠️ Activer maintenance Uptime Kuma
+        run: |
+          echo "🔧 Activation de la maintenance sur le moniteur ID $KUMA_MONITOR_ID"
+          curl -s -X POST "$KUMA_URL/api/maintenance" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $KUMA_API_KEY" \
+            -d '{
+              "monitorID": '"$KUMA_MONITOR_ID"',
+              "title": "Maintenance CI/CD",
+              "description": "Déploiement Walrus Labs en cours"
+            }'
+
       - name: 🚀 Build du projet Angular
         run: npm run build -- --configuration=production
 
       - name: 🐳 Build et tag de l'image Docker
-        run: |
-          docker build -t albatros.walrus-labs.fr .
+        run: docker build -t albatros.walrus-labs.fr .
 
       - name: 🔑 Ajouter la clé SSH du serveur
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          echo "$VPS_SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -t ed25519 ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -t ed25519 $VPS_IP >> ~/.ssh/known_hosts
 
       - name: 📂 Créer le répertoire cible sur le serveur
-        run: ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} "mkdir -p ~/www/albatros.walrus-labs.fr && chmod 755 ~/www/albatros.walrus-labs.fr"
+        run: ssh -i ~/.ssh/id_ed25519 $VPS_USER@$VPS_IP "mkdir -p ~/www/albatros.walrus-labs.fr && chmod 755 ~/www/albatros.walrus-labs.fr"
 
       - name: 🚀 Déploiement rapide avec `rsync`
         run: |
-          rsync -azP --delete --exclude=node_modules -e "ssh -i ~/.ssh/id_ed25519" ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:~/www/albatros.walrus-labs.fr
+          rsync -azP --delete --exclude=node_modules -e "ssh -i ~/.ssh/id_ed25519" ./ $VPS_USER@$VPS_IP:~/www/albatros.walrus-labs.fr
 
       - name: 🐳 Déployer le conteneur via Docker Compose
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} << 'EOF'
+          ssh -i ~/.ssh/id_ed25519 $VPS_USER@$VPS_IP << 'EOF'
           cd ~/www/albatros.walrus-labs.fr
           docker compose up -d --build
           EOF
+
+      - name: ✅ Désactiver maintenance Uptime Kuma
+        if: always()
+        run: |
+          echo "✅ Fin de maintenance pour le moniteur ID $KUMA_MONITOR_ID"
+          curl -s -X POST "$KUMA_URL/api/maintenance/delete" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $KUMA_API_KEY" \
+            -d '{"monitorID": '"$KUMA_MONITOR_ID"'}'
