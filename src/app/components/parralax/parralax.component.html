@@ -1,0 +1,9 @@
+<div class="scene" (mousemove)="onMouseMove($event)">
+  <div class="background-container">
+    <div
+      class="background"
+      [ngStyle]="{ transform: backgroundTransform }"
+    ></div>
+  </div>
+  <div class="bird" [ngStyle]="{ transform: birdTransform }"></div>
+</div>
