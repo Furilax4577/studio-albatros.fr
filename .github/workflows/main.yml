@@ -9,11 +9,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: main
+
     env:
-      VPS_DEPLOY_PATH: ~/www/albatros.walrus-labs.fr
       VPS_IP: ${{ secrets.VPS_IP }}
       VPS_USER: ${{ secrets.VPS_USER }}
       VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+      VPS_DEPLOY_PATH: /root/www/studio-albatros.fr
+      ANGULAR_API_URL: http://chatbot.walrus-labs.fr/api
+      ANGULAR_SOCKET_URL: https://chatbot.walrus-labs.fr
 
     steps:
       - name: 📥 Cloner le dépôt
@@ -24,14 +27,25 @@ jobs:
         with:
           node-version: 22
 
+      - name: 🧩 Générer config.json dans `public`
+        run: |
+          echo "📦 Génération de public/config.json"
+          mkdir -p public
+          cat <<EOF > public/config.json
+          {
+            "apiUrl": "${ANGULAR_API_URL}",
+            "websocketUrl": "${ANGULAR_SOCKET_URL}"
+          }
+          EOF
+
       - name: 📦 Installer les dépendances
-        run: npm ci
+        run: npm install
 
       - name: 🚀 Build du projet Angular
         run: npm run build -- --configuration=production
 
       - name: 🐳 Build et tag de l'image Docker
-        run: docker build -t albatros.walrus-labs.fr .
+        run: docker build -t studio-albatros.fr .
 
       - name: 🔑 Ajouter la clé SSH du serveur
         run: |
@@ -40,17 +54,15 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -t ed25519 $VPS_IP >> ~/.ssh/known_hosts
 
-      - name: 📂 Créer le répertoire cible sur le serveur
-        run: ssh -i ~/.ssh/id_ed25519 $VPS_USER@$VPS_IP "mkdir -p VPS_DEPLOY_PATH && chmod 755 VPS_DEPLOY_PATH"
-
-      - name: 🚀 Déploiement rapide avec `rsync`
+      - name: 🚀 Déploiement avec rsync
         run: |
-          rsync -azP --delete --exclude=node_modules -e "ssh -i ~/.ssh/id_ed25519" ./ $VPS_USER@$VPS_IP:VPS_DEPLOY_PATH
+          rsync -azP --delete \
+            --exclude=node_modules \
+            -e "ssh -i ~/.ssh/id_ed25519" ./ $VPS_USER@$VPS_IP:$VPS_DEPLOY_PATH
 
-      - name: 🐳 Déployer le conteneur via Docker Compose
+      - name: 🐳 Docker Compose up
         run: |
-          ssh -i ~/.ssh/id_ed25519 $VPS_USER@$VPS_IP << 'EOF'
-            set -e
-            cd VPS_DEPLOY_PATH
+          ssh -i ~/.ssh/id_ed25519 $VPS_USER@$VPS_IP << EOF
+            cd $VPS_DEPLOY_PATH
             docker compose up -d --build
           EOF
