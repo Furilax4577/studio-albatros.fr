@@ -2,7 +2,8 @@ import { Injectable, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { ConfigService } from './config.service';
+import { AppConfig } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -10,16 +11,22 @@ import { environment } from '../environments/environment';
 export class WebsocketService {
   private socket: Socket | null = null;
   private isBrowser: boolean;
+  private appConfig!: AppConfig;
 
-  constructor(@Inject(PLATFORM_ID) platformId: Object, private ngZone: NgZone) {
+  constructor(
+    @Inject(PLATFORM_ID) platformId: Object,
+    private ngZone: NgZone,
+    private configService: ConfigService
+  ) {
     this.isBrowser = isPlatformBrowser(platformId);
+    this.appConfig = this.configService.getConfig();
   }
 
   connect(clientId: string) {
     if (!this.isBrowser || this.socket?.connected) return;
 
     this.ngZone.runOutsideAngular(() => {
-      this.socket = io(environment.websocketUrl, {
+      this.socket = io(this.appConfig.websocketUrl, {
         query: { clientId },
       });
 
