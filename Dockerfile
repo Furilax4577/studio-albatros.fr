@@ -11,6 +11,6 @@ FROM nginx:latest
 COPY --from=build /app/dist/studio/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Exposer le port 8082
-EXPOSE 8082
+# Exposer le port 8083
+EXPOSE 8083
 CMD ["nginx", "-g", "daemon off;"]
