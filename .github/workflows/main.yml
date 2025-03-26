@@ -14,7 +14,7 @@ jobs:
       VPS_IP: ${{ secrets.VPS_IP }}
       VPS_USER: ${{ secrets.VPS_USER }}
       VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-      VPS_DEPLOY_PATH: /root/www/studio-albatros.fr
+      VPS_DEPLOY_PATH: ~/www/studio-albatros.fr
       ANGULAR_API_URL: http://chatbot.walrus-labs.fr/api
       ANGULAR_SOCKET_URL: https://chatbot.walrus-labs.fr
 
