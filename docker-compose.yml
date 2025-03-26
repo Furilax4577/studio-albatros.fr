@@ -1,0 +1,7 @@
+services:
+  angular-app:
+    build: .
+    container_name: albatros.walrus-labs.fr
+    ports:
+      - "8082:8082" # Expose le port 8082
+    restart: unless-stopped
