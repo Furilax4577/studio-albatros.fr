@@ -1,0 +1,22 @@
+<div class="chat">
+  <div class="messages">
+    <div
+      class="line"
+      [ngClass]="message.source"
+      *ngFor="let message of messages"
+    >
+      <div class="message">
+        <strong>{{ message.source === "to" ? "Moi" : "Albatar" }}: </strong
+        >{{ message.message }}
+      </div>
+    </div>
+  </div>
+  <div class="textarea">
+    <input
+      [(ngModel)]="message"
+      (keydown.enter)="sendMessage()"
+      placeholder="Tape ton message"
+    />
+    <button (click)="sendMessage()">Envoyer</button>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+:host {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  display: flex;
+  justify-content: center;
+  .wrap {
+    position: relative;
+    width: 500px;
+    height: 800px;
+  }
+}

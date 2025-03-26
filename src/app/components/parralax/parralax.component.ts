@@ -1,27 +1,31 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   Component,
   HostListener,
   Inject,
-  OnDestroy,
   PLATFORM_ID,
+  AfterViewInit,
+  OnDestroy,
+  NgZone,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-parralax',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './parralax.component.html',
   styleUrl: './parralax.component.scss',
 })
-export class ParralaxComponent implements OnDestroy {
-  birdX: number = 0;
-  birdY: number = 0;
-  targetX: number = 0;
-  targetY: number = 0;
-  animationFrameId: number = 0;
-  birdRatio = 1;
-  backgroundRatio = 0.2;
+export class ParralaxComponent implements AfterViewInit, OnDestroy {
+  birdX = 0;
+  birdY = 0;
+  targetX = 0;
+  targetY = 0;
+  animationFrameId = 0;
+  birdRatio = 0.5;
+  backgroundRatio = 0.25;
+
+  isBrowser: boolean;
 
   get birdTransform(): string {
     return `translate(calc(-50% + ${
@@ -37,15 +41,24 @@ export class ParralaxComponent implements OnDestroy {
 
   @HostListener('window:mousemove', ['$event'])
   onMouseMove(event: MouseEvent) {
+    if (!this.isBrowser) return;
+
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
-    this.targetX = (event.clientX - centerX) * 0.1;
-    this.targetY = (event.clientY - centerY) * 0.1;
+    const x = (event.clientX - centerX) * 0.1;
+    const y = (event.clientY - centerY) * 0.1;
+
+    this.targetX = x;
+    this.targetY = y;
   }
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.animate();
+  constructor(@Inject(PLATFORM_ID) platformId: Object, private ngZone: NgZone) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
+
+  ngAfterViewInit(): void {
+    if (this.isBrowser) {
+      this.ngZone.runOutsideAngular(() => this.animate());
     }
   }
 
@@ -60,7 +73,7 @@ export class ParralaxComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser) {
       cancelAnimationFrame(this.animationFrameId);
     }
   }

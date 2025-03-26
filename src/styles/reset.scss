@@ -1,0 +1,162 @@
+/* Reset CSS - Basé sur les meilleures pratiques modernes */
+
+/* Box-sizing global */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Suppression des marges et paddings par défaut */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* Suppression de l'affichage de liste par défaut */
+ol,
+ul {
+  list-style: none;
+}
+
+/* Suppression des décorations de liens */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Suppression des styles de bouton par défaut */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* Ajustement des images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Suppression de l'héritage des styles de texte pour les inputs et boutons */
+button {
+  cursor: pointer;
+}
+
+/* Normalisation du comportement des tableaux */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Normalisation de l'affichage des éléments HTML5 inconnus */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+/* Assurer que le body prend toute la hauteur */
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
