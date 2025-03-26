@@ -8,7 +8,7 @@ RUN npm run build --configuration=production
 
 # Étape 2 : Servir l'application avec Nginx
 FROM nginx:latest
-COPY --from=build /app/dist/douville.quentin.dev/browser /usr/share/nginx/html
+COPY --from=build /app/dist/studio/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exposer le port 8082
