@@ -2,6 +2,7 @@ import { Injectable, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +19,7 @@ export class WebsocketService {
     if (!this.isBrowser || this.socket?.connected) return;
 
     this.ngZone.runOutsideAngular(() => {
-      this.socket = io('http://localhost:3000', {
+      this.socket = io(environment.websocketUrl, {
         query: { clientId },
       });
 

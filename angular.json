@@ -35,7 +35,14 @@
             "prerender": true,
             "ssr": {
               "entry": "src/server.ts"
-            }
+            },
+            "allowedCommonJsDependencies": [
+              "debug",
+              "engine.io-client",
+              "socket.io-client",
+              "socket.io-parser",
+              "xmlhttprequest-ssl"
+            ]
           },
           "configurations": {
             "production": {
