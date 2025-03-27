@@ -20,7 +20,6 @@ export class ChatComponent {
 
   message = '';
   messages: { source: 'from' | 'to'; message: string }[] = [];
-  clientId = 'demo-client';
 
   constructor(
     private websocketService: WebsocketService,
@@ -29,7 +28,7 @@ export class ChatComponent {
 
   ngOnInit(): void {
     console.log('ngOnInit', this.constructor.name);
-    this.websocketService.connect(this.clientId);
+    this.websocketService.connect();
 
     this.websocketService.onResponse().subscribe((response) => {
       this.messages.push({ source: 'from', message: response });
@@ -48,7 +47,7 @@ export class ChatComponent {
     console.log('sendMessage');
     if (this.message.trim()) {
       this.messages.push({ source: 'to', message: this.message });
-      this.websocketService.sendMessage(this.message, this.clientId);
+      this.websocketService.sendMessage(this.message);
       this.message = '';
     }
   }
