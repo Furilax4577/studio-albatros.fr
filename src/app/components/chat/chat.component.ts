@@ -18,8 +18,9 @@ import { MarkdownModule } from 'ngx-markdown';
 export class ChatComponent {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
-  message = '';
+  message: string = '';
   messages: { source: 'from' | 'to'; message: string }[] = [];
+  isBotTyping: boolean = false;
 
   constructor(
     private websocketService: WebsocketService,
@@ -27,8 +28,12 @@ export class ChatComponent {
   ) {}
 
   ngOnInit(): void {
-    console.log('ngOnInit', this.constructor.name);
     this.websocketService.connect();
+
+    this.websocketService.isBotTyping$.subscribe((typing) => {
+      this.isBotTyping = typing;
+      this.changeDetectorRef.detectChanges();
+    });
 
     this.websocketService.onResponse().subscribe((response) => {
       this.messages.push({ source: 'from', message: response });
@@ -44,17 +49,15 @@ export class ChatComponent {
   }
 
   sendMessage(): void {
-    console.log('sendMessage');
     if (this.message.trim()) {
       this.messages.push({ source: 'to', message: this.message });
       this.websocketService.sendMessage(this.message);
       this.message = '';
+      this.scrollToBottom();
     }
   }
 
-  ngOnDestroy(): void {
-    console.log('ngOnDestroy', this.constructor.name);
-  }
+  ngOnDestroy(): void {}
 
   private scrollToBottom(): void {
     setTimeout(() => {
