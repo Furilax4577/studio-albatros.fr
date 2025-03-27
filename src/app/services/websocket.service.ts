@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ConfigService } from './config.service';
 import { AppConfig } from '../interfaces';
 import { LocalStorageService } from './local-storage.service';
@@ -16,6 +16,9 @@ export class WebsocketService {
   private appConfig!: AppConfig;
   private readonly STORAGE_KEY = 'clientId';
   private clientId!: string;
+
+  private isBotTypingSubject = new BehaviorSubject<boolean>(false);
+  public isBotTyping$ = this.isBotTypingSubject.asObservable();
 
   constructor(
     @Inject(PLATFORM_ID) platformId: Object,
@@ -51,6 +54,7 @@ export class WebsocketService {
 
   sendMessage(message: string) {
     if (this.isBrowser && this.socket?.connected) {
+      this.isBotTypingSubject.next(true);
       this.socket.emit('user-message', {
         clientId: this.clientId,
         message,
@@ -61,7 +65,10 @@ export class WebsocketService {
   onResponse(): Observable<string> {
     return new Observable((observer) => {
       if (this.isBrowser && this.socket) {
-        this.socket.on('chat-response', (data) => observer.next(data.message));
+        this.socket.on('chat-response', (data) => {
+          observer.next(data.message);
+          this.isBotTypingSubject.next(false);
+        });
       }
     });
   }
@@ -69,7 +76,10 @@ export class WebsocketService {
   onError(): Observable<string> {
     return new Observable((observer) => {
       if (this.isBrowser && this.socket) {
-        this.socket.on('chat-error', (data) => observer.next(data.error));
+        this.socket.on('chat-error', (data) => {
+          observer.next(data.error);
+          this.isBotTypingSubject.next(false);
+        });
       }
     });
   }

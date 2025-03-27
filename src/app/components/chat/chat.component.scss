@@ -40,6 +40,15 @@
     border-radius: 15px;
   }
 
+  .answering {
+    span {
+      &::after {
+        content: "...";
+        animation: dots 2s steps(3, end) infinite;
+      }
+    }
+  }
+
   .textarea {
     font-size: 12px;
     border-top: 2px solid white;
@@ -72,5 +81,22 @@
   input::placeholder {
     color: white;
     opacity: 0.7;
+  }
+
+  @keyframes dots {
+    0%,
+    20% {
+      content: "";
+    }
+    40% {
+      content: ".";
+    }
+    60% {
+      content: "..";
+    }
+    80%,
+    100% {
+      content: "...";
+    }
   }
 }
