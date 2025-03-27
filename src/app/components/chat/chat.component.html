@@ -9,6 +9,11 @@
         <strong>{{ message.source === "to" ? "Moi" : "Albatar" }}</strong>
         <markdown [data]="message.message"></markdown>
       </div>
+      <!-- <div class="buttons">
+        <button *ngFor="let button of message.buttons">
+          {{ button }}
+        </button>
+      </div> -->
     </div>
     <div class="line from" *ngIf="isBotTyping">
       <div class="message answering">

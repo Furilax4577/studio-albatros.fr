@@ -27,8 +27,31 @@
   .line {
     width: 100%;
     display: flex;
+    flex-direction: column;
     &.from {
       justify-content: end;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding-top: 15px;
+    row-gap: 15px;
+    gap: 15px;
+    button {
+      background-color: #f0f0f0;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
     }
   }
 

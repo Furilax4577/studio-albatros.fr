@@ -6,6 +6,7 @@ import { ConfigService } from './config.service';
 import { AppConfig } from '../interfaces';
 import { LocalStorageService } from './local-storage.service';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatResponse } from '../components/chat/chat.component';
 
 @Injectable({
   providedIn: 'root',
@@ -62,11 +63,11 @@ export class WebsocketService {
     }
   }
 
-  onResponse(): Observable<string> {
+  onResponse(): Observable<ChatResponse> {
     return new Observable((observer) => {
       if (this.isBrowser && this.socket) {
-        this.socket.on('chat-response', (data) => {
-          observer.next(data.message);
+        this.socket.on('chat-response', (data: ChatResponse) => {
+          observer.next(data);
           this.isBotTypingSubject.next(false);
         });
       }

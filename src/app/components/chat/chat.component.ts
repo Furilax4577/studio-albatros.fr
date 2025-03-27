@@ -9,6 +9,11 @@ import { WebsocketService } from '../../services/websocket.service';
 import { FormsModule } from '@angular/forms';
 import { MarkdownModule } from 'ngx-markdown';
 
+export interface ChatResponse {
+  message: string;
+  buttons?: string[];
+}
+
 @Component({
   selector: 'app-chat',
   imports: [CommonModule, FormsModule, MarkdownModule],
@@ -19,7 +24,8 @@ export class ChatComponent {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   message: string = '';
-  messages: { source: 'from' | 'to'; message: string }[] = [];
+  messages: { source: 'from' | 'to'; message: string; buttons?: string[] }[] =
+    [];
   isBotTyping: boolean = false;
 
   constructor(
@@ -35,8 +41,12 @@ export class ChatComponent {
       this.changeDetectorRef.detectChanges();
     });
 
-    this.websocketService.onResponse().subscribe((response) => {
-      this.messages.push({ source: 'from', message: response });
+    this.websocketService.onResponse().subscribe((response: ChatResponse) => {
+      this.messages.push({
+        source: 'from',
+        message: response.message,
+        buttons: response.buttons,
+      });
       this.changeDetectorRef.detectChanges();
       this.scrollToBottom();
     });
