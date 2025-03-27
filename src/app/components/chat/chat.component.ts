@@ -1,10 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { WebsocketService } from '../../services/websocket.service';
 import { FormsModule } from '@angular/forms';
 import { MarkdownModule } from 'ngx-markdown';
@@ -28,17 +23,13 @@ export class ChatComponent {
     [];
   isBotTyping: boolean = false;
 
-  constructor(
-    private websocketService: WebsocketService,
-    private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  constructor(private websocketService: WebsocketService) {}
 
   ngOnInit(): void {
     this.websocketService.connect();
 
     this.websocketService.isBotTyping$.subscribe((typing) => {
       this.isBotTyping = typing;
-      this.changeDetectorRef.detectChanges();
     });
 
     this.websocketService.onResponse().subscribe((response: ChatResponse) => {
@@ -47,13 +38,11 @@ export class ChatComponent {
         message: response.message,
         buttons: response.buttons,
       });
-      this.changeDetectorRef.detectChanges();
       this.scrollToBottom();
     });
 
     this.websocketService.onError().subscribe((error) => {
       this.messages.push({ source: 'from', message: error });
-      this.changeDetectorRef.detectChanges();
       this.scrollToBottom();
     });
   }

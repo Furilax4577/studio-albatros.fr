@@ -67,8 +67,10 @@ export class WebsocketService {
     return new Observable((observer) => {
       if (this.isBrowser && this.socket) {
         this.socket.on('chat-response', (data: ChatResponse) => {
-          observer.next(data);
-          this.isBotTypingSubject.next(false);
+          this.ngZone.run(() => {
+            observer.next(data);
+            this.isBotTypingSubject.next(false);
+          });
         });
       }
     });
@@ -78,8 +80,10 @@ export class WebsocketService {
     return new Observable((observer) => {
       if (this.isBrowser && this.socket) {
         this.socket.on('chat-error', (data) => {
-          observer.next(data.error);
-          this.isBotTypingSubject.next(false);
+          this.ngZone.run(() => {
+            observer.next(data.error);
+            this.isBotTypingSubject.next(false);
+          });
         });
       }
     });
